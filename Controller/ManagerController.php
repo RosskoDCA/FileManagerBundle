@@ -350,13 +350,13 @@ class ManagerController extends AbstractController
                     if (0 !== mb_strpos($filePath, $fileManager->getCurrentPath())) {
                         $this->addFlash('danger', 'file.deleted.danger');
                     } else {
-                        $this->dispatch(FileManagerEvents::PRE_DELETE_FILE);
-                        try {
-                            $fs->remove($filePath);
-                            $is_delete = true;
-                        } catch (IOException $exception) {
-                            $this->addFlash('danger', 'file.deleted.unauthorized');
-                        }
+                        $event = $this->dispatch(FileManagerEvents::PRE_DELETE_FILE);
+//                        try {
+//                            $fs->remove($filePath);
+//                            $is_delete = true;
+//                        } catch (IOException $exception) {
+//                            $this->addFlash('danger', 'file.deleted.unauthorized');
+//                        }
                         $this->dispatch(FileManagerEvents::POST_DELETE_FILE);
                     }
                 }
@@ -514,7 +514,7 @@ class ManagerController extends AbstractController
         return $this->fileManager;
     }
 
-    protected function dispatch($eventName, array $arguments = [])
+    protected function dispatch($eventName, array $arguments = []): GenericEvent
     {
         $arguments = array_replace([
             'filemanager' => $this->fileManager,
@@ -522,6 +522,6 @@ class ManagerController extends AbstractController
 
         $subject = $arguments['filemanager'];
         $event = new GenericEvent($subject, $arguments);
-        $this->dispatcher->dispatch($event, $eventName);
+        return $this->dispatcher->dispatch($event, $eventName);
     }
 }
