@@ -12,6 +12,8 @@
 
 namespace Artgris\Bundle\FileManagerBundle\Helpers;
 
+use Symfony\Component\String\Slugger\AsciiSlugger;
+
 class UploadHandler
 {
     protected $options;
@@ -519,6 +521,14 @@ class UploadHandler
         if ($this->options['override']) {
             return $name;
         }
+
+        $fileName = pathinfo($name, PATHINFO_FILENAME);
+        $fileExtension = pathinfo($name, PATHINFO_EXTENSION);
+
+        // Slugging
+        $slugger = new AsciiSlugger();
+        $fileName = $slugger->slug($fileName);
+        $name = sprintf('%s.%s', $fileName, $fileExtension);
 
         while (is_dir($this->get_upload_path($name))) {
             $name = $this->upcount_name($name);
