@@ -2,6 +2,7 @@
 
 namespace Artgris\Bundle\FileManagerBundle\Controller;
 
+use Artgris\Bundle\FileManagerBundle\Event\FileManagerEventProps;
 use Artgris\Bundle\FileManagerBundle\Event\FileManagerEvents;
 use Artgris\Bundle\FileManagerBundle\Helpers\File;
 use Artgris\Bundle\FileManagerBundle\Helpers\FileManager;
@@ -255,6 +256,10 @@ class ManagerController extends AbstractController
                         $fs->rename($OldfilePath, $NewfilePath);
                         $this->addFlash('success', $this->translator->trans('file.renamed.success'));
                         //File has been renamed successfully
+                        $this->dispatch(FileManagerEvents::POST_RENAME_FILE, [
+                            'oldFilePath' => $OldfilePath,
+                            'newFilePath' => $NewfilePath,
+                        ]);
                     } catch (IOException $exception) {
                         $this->addFlash('danger', $this->translator->trans('file.renamed.danger'));
                     }
@@ -351,12 +356,17 @@ class ManagerController extends AbstractController
                         $this->addFlash('danger', 'file.deleted.danger');
                     } else {
                         $event = $this->dispatch(FileManagerEvents::PRE_DELETE_FILE);
-//                        try {
-//                            $fs->remove($filePath);
-//                            $is_delete = true;
-//                        } catch (IOException $exception) {
-//                            $this->addFlash('danger', 'file.deleted.unauthorized');
-//                        }
+                        if (
+                            $event->hasArgument(FileManagerEventProps::PROCESS_DELETE_ACTION) === false
+                            || $event->getArgument(FileManagerEventProps::PROCESS_DELETE_ACTION) === true
+                        ) {
+                            try {
+                                $fs->remove($filePath);
+                                $is_delete = true;
+                            } catch (IOException $exception) {
+                                $this->addFlash('danger', 'file.deleted.unauthorized');
+                            }
+                        }
                         $this->dispatch(FileManagerEvents::POST_DELETE_FILE);
                     }
                 }
@@ -365,12 +375,17 @@ class ManagerController extends AbstractController
                 }
                 unset($queryParameters['delete']);
             } else {
-                $this->dispatch(FileManagerEvents::PRE_DELETE_FOLDER);
-                try {
-                    $fs->remove($fileManager->getCurrentPath());
-                    $this->addFlash('success', 'folder.deleted.success');
-                } catch (IOException $exception) {
-                    $this->addFlash('danger', 'folder.deleted.unauthorized');
+                $event = $this->dispatch(FileManagerEvents::PRE_DELETE_FOLDER);
+                if (
+                    $event->hasArgument(FileManagerEventProps::PROCESS_DELETE_ACTION) === false
+                    || $event->getArgument(FileManagerEventProps::PROCESS_DELETE_ACTION) === true
+                ) {
+                    try {
+                        $fs->remove($fileManager->getCurrentPath());
+                        $this->addFlash('success', 'folder.deleted.success');
+                    } catch (IOException $exception) {
+                        $this->addFlash('danger', 'folder.deleted.unauthorized');
+                    }
                 }
 
                 $this->dispatch(FileManagerEvents::POST_DELETE_FOLDER);
@@ -514,6 +529,11 @@ class ManagerController extends AbstractController
         return $this->fileManager;
     }
 
+    /**
+     * @param $eventName
+     * @param array $arguments
+     * @return GenericEvent
+     */
     protected function dispatch($eventName, array $arguments = []): GenericEvent
     {
         $arguments = array_replace([
@@ -522,6 +542,10 @@ class ManagerController extends AbstractController
 
         $subject = $arguments['filemanager'];
         $event = new GenericEvent($subject, $arguments);
-        return $this->dispatcher->dispatch($event, $eventName);
+
+        /** @var GenericEvent $returnedEvent */
+        $returnedEvent = $this->dispatcher->dispatch($event, $eventName);
+
+        return $returnedEvent;
     }
 }
