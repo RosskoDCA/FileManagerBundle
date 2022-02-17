@@ -237,6 +237,10 @@ class ManagerController extends AbstractController
     public function renameFileAction(Request $request, $fileName)
     {
         $queryParameters = $request->query->all();
+
+        $this->addFlash('warning', 'Momentálne je premenovanie nedostupné');
+        return $this->redirectToRoute('file_manager', $queryParameters);
+
         $formRename = $this->createRenameForm();
         /* @var Form $formRename */
         $formRename->handleRequest($request);
@@ -344,6 +348,10 @@ class ManagerController extends AbstractController
         $form = $this->createDeleteForm();
         $form->handleRequest($request);
         $queryParameters = $request->query->all();
+
+        $this->addFlash('warning', 'Momentálne je mazanie nedostupné');
+        return $this->redirectToRoute('file_manager', $queryParameters);
+
         if ($form->isSubmitted() && $form->isValid()) {
             // remove file
             $fileManager = $this->newFileManager($queryParameters);
