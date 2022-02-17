@@ -1,0 +1,61 @@
+file:
+  add:
+    success: bol úspešne nahratý
+  renamed:
+    success: Súbor bol úspešne premenovaný
+    danger: Súbor už existuje alebo nemáte oprávnenie na premenovanie.
+    unauthorized: Súbory už neexistujú alebo nemáte oprávenenie ich prezerať.
+    nochanged: Žiadna zmena nebola zistená
+  deleted:
+    success: Súbory boli úspešne vymazané
+    danger: Súbory už neexistujú alebo nemáte oprávenenie ich prezerať.
+    unauthorized: Súbory už neexistujú alebo nemáte oprávenenie ich prezerať.
+folder:
+  add:
+    danger: "Pri vytváraní zložky nastala chyba: %message%"
+    success: Zložka bola vytvorená
+  deleted:
+    success: Zložka bola zmazaná
+    unauthorized: Zložka už neexistuje alebo nemáte oprávenenie do neň vstúpiť.
+button:
+  cancel: ZRUŠIŤ
+  refresh: Obnoviť
+  parent: O úroveň vyššie
+  save: Uložiť
+  add:
+    files: Pridať súbory...
+    folder: Nová zložka...
+  delete:
+    current: Zmazať túto zložku
+    selected: Zmazať vybrané súbory
+    action: ZMAZAŤ
+  rename:
+    action: PREMENOVAŤ
+  tree: Strom
+title:
+  add:
+    folder: Nová zložka
+  rename:
+    file: Premenovať
+  delete: Zmazať
+  download: Stiahnuť
+  preview:
+    file: Otvoriť
+input:
+  default: Nova zlozka
+table:
+  name: Názov
+  date: Dátum
+  size: Veľkosť
+  dimension: Rozmery
+  actions: Akcie
+confirm:
+  delete:  Ste si istý, že chcete zmazať?
+size:
+  mb: MB
+  kb: kB
+select-all: Vybrať všetky
+upload:
+  exception_move_uploaded_file: Prístup zamietnutý.
+search:
+  placeholder: Vyhľadať
