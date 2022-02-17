@@ -308,7 +308,7 @@ class ManagerController extends AbstractController
             }
         }
 
-        $this->dispatch(FileManagerEvents::POST_UPDATE, ['response' => &$response]);
+        $this->dispatch(FileManagerEvents::POST_UPDATE, ['response' => &$response, 'path' => $fileManager->getCurrentPath()]);
 
         return new JsonResponse($response);
     }
